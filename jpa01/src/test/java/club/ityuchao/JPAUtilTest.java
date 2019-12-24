@@ -145,6 +145,27 @@ public class JPAUtilTest {
         }
     }
 
+    //查询一个：使用延迟加载
+    @Test
+    public void getByIdLazyTest(){
+        EntityManager em = null;
+        EntityTransaction tx = null;
+        try {
+            em = JPAUtil.getEntityManager();
+            tx = em.getTransaction();
+            tx.begin();
+
+            Customer customer = em.getReference(Customer.class, 2L);
+
+            System.out.println(customer);
+            tx.commit();
+        } catch (Exception e) {
+            tx.rollback();
+            e.printStackTrace();
+        } finally {
+            em.close();
+        }
+    }
 
 
     /*-----------------------------------------JPQL查询------------------------------------------------------------------------*/
