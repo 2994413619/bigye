@@ -11,7 +11,7 @@
     <groupId>club.ityuchao</groupId>
     <artifactId>user-provide</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <name>user-consumers</name>
+    <name>user-provide</name>
     <description>Demo project for Spring Boot</description>
 
     <properties>
