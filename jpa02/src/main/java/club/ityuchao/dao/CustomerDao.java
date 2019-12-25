@@ -15,6 +15,8 @@ import java.util.List;
  */
 public interface CustomerDao extends JpaRepository<Customer, Long>, JpaSpecificationExecutor<Customer> {
 
+    /*-----------------------------------------------jpql查询being-----------------------------------------------------*/
+
     @Query("from Customer")
     public List<Customer> getAllCustomer();
 
@@ -25,12 +27,20 @@ public interface CustomerDao extends JpaRepository<Customer, Long>, JpaSpecifica
     @Modifying
     public void updateCustomer(String name, Long id);
 
+    /*-----------------------------------------------jpql查询end-------------------------------------------------------*/
+
+    /*-----------------------------------------------sql查询begin------------------------------------------------------*/
+
     //nativeQuery默认值为false，表示使用jpql查询，true表示使用本地查询（sql查询）
     @Query(value = "select * from cst_customer", nativeQuery = true)
     public List<Customer> selectAllBySql();
 
     @Query(value = "select * from cst_customer where cust_name like ?1",nativeQuery = true)
     public List<Customer> selectByNameSql(String name);
+
+    /*-----------------------------------------------sql查询end--------------------------------------------------------*/
+
+    /*-----------------------------------------------方法命名规则查询begin----------------------------------------------*/
 
     //根据方法名命名规则查询
     public Customer findByCustName(String custName);
@@ -40,6 +50,8 @@ public interface CustomerDao extends JpaRepository<Customer, Long>, JpaSpecifica
 
     //使用客户名称模糊匹配和客户所属行业精准匹配的查询
     public Customer findByCustNameLikeAndCustIndustry(String custName, String custIndustry);
+
+    /*-----------------------------------------------方法命名规则查询end------------------------------------------------*/
 
 
 }

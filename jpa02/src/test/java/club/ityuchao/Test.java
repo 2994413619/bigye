@@ -4,17 +4,23 @@ import club.ityuchao.dao.CustomerDao;
 import club.ityuchao.entity.Customer;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.persistence.criteria.*;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * @Author yuchao
  * @date: 2019/12/24 15:34
- * @Description:
+ * @Description: Spring data jpa 单表练习
  */
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations= "classpath:applicationContext.xml")
@@ -76,6 +82,8 @@ public class Test {
         System.out.println(exists);
     }
 
+    /*-----------------------------------------------jpql查询begin----------------------------------------------------------*/
+
     //jpql查询:查询所有customer
     @org.junit.Test
     public void test1(){
@@ -100,6 +108,10 @@ public class Test {
         customerDao.updateCustomer("百度", 5l);
     }
 
+    /*-----------------------------------------------jpql查询end----------------------------------------------------------*/
+
+    /*-----------------------------------------------sql查询begin----------------------------------------------------------*/
+
     //使用sql所有customer
     @org.junit.Test
     public void selectAllBySqlTest(){
@@ -118,14 +130,18 @@ public class Test {
         }
     }
 
-    //根据命名规则进行查询
+    /*-----------------------------------------------sql查询end----------------------------------------------------------*/
+
+    /*-----------------------------------------------方法命名规则查询begin------------------------------------------------*/
+
+    //单条件查询：根据客户名
     @org.junit.Test
     public void test11(){
         Customer cu = customerDao.findByCustName("阿里巴巴");
         System.out.println(cu);
     }
 
-    //根据命名规则进行模糊查询
+    //模糊查询：根据客户名
     @org.junit.Test
     public void test12(){
         List<Customer> list = customerDao.findByCustNameLike("腾讯%");
@@ -134,10 +150,88 @@ public class Test {
         }
     }
 
-    //使用客户名称模糊匹配和客户所属行业精准匹配的查询
+    //多条件查询：客户名称模糊匹配、客户所属行业精准匹配
     @org.junit.Test
     public void test13(){
         Customer customer = customerDao.findByCustNameLikeAndCustIndustry("阿里巴巴", "互联网");
         System.out.println(customer);
     }
+
+    /*-----------------------------------------------方法命名规则查询end----------------------------------------------------------*/
+
+    /*-----------------------------------------------specifications查询begin------------------------------------------------------*/
+
+    //单条件查询：根据id
+    @org.junit.Test
+    public void specTest1(){
+        Specification<Customer> spec = new Specification<Customer>() {
+            @Override
+            public Predicate toPredicate(Root<Customer> root, CriteriaQuery<?> criteriaQuery, CriteriaBuilder criteriaBuilder) {
+                //获取比较的属性
+                Path<Object> custId = root.get("custId");
+                //构造查询条件
+                Predicate predicate = criteriaBuilder.equal(custId, 2l);
+                return predicate;
+            }
+        };
+
+        Optional<Customer> one = customerDao.findOne(spec);
+        System.out.println(one.get());
+    }
+
+    //多条件查询：客户名、所属行业
+    @org.junit.Test
+    public void specTest2(){
+        Specification<Customer> spec = new Specification<Customer>() {
+            @Override
+            public Predicate toPredicate(Root<Customer> root, CriteriaQuery<?> criteriaQuery, CriteriaBuilder criteriaBuilder) {
+                Path<Object> custName = root.get("custName");
+                Path<Object> custIndustry = root.get("custIndustry");
+                Predicate p1 = criteriaBuilder.equal(custName, "阿里巴巴");
+                Predicate p2 = criteriaBuilder.equal(custIndustry, "互联网");
+                //组合两个条件
+                Predicate and = criteriaBuilder.and(p1, p2);
+                return and;
+            }
+        };
+
+        Customer customer = customerDao.findOne(spec).get();
+        System.out.println(customer);
+
+    }
+
+    //模糊查询并排序：custName模糊查询，custID降序
+    @org.junit.Test
+    public void specTest3(){
+        Specification<Customer> spec = new Specification<Customer>() {
+            @Override
+            public Predicate toPredicate(Root<Customer> root, CriteriaQuery<?> criteriaQuery, CriteriaBuilder criteriaBuilder) {
+                Path custName = root.get("custName");
+                Predicate pr = criteriaBuilder.like(custName, "腾讯%");
+                return pr;
+            }
+        };
+        Sort sort = Sort.by(Sort.Direction.DESC, "custId");
+
+        List<Customer> all = customerDao.findAll(spec, sort);
+        for(Customer customer : all){
+            System.out.println(customer);
+        }
+
+    }
+
+    //分页查询
+    @org.junit.Test
+    public void specTest4(){
+        Specification<Customer> spec = null;
+        PageRequest page = PageRequest.of(0, 2);
+        Page<Customer> all = customerDao.findAll(spec, page);
+        System.out.println(all.getContent());//得到数据集合
+        System.out.println(all.getTotalElements());//总条数
+        System.out.println(all.getTotalPages());//总页数
+    }
+
+    /*-----------------------------------------------specifications查询end--------------------------------------------------------*/
+
+
 }
