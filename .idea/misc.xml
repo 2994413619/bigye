@@ -8,6 +8,7 @@
         <option value="$PROJECT_DIR$/jpa01/pom.xml" />
         <option value="$PROJECT_DIR$/jpa02/pom.xml" />
         <option value="$PROJECT_DIR$/jpa03/pom.xml" />
+        <option value="$PROJECT_DIR$/jpa03-onetomany/pom.xml" />
       </list>
     </option>
   </component>
