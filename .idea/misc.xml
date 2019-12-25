@@ -9,6 +9,8 @@
         <option value="$PROJECT_DIR$/jpa02/pom.xml" />
         <option value="$PROJECT_DIR$/jpa03/pom.xml" />
         <option value="$PROJECT_DIR$/jpa03-onetomany/pom.xml" />
+        <option value="$PROJECT_DIR$/user-provide/pom.xml" />
+        <option value="$PROJECT_DIR$/jpa03-manytomany/pom.xml" />
       </list>
     </option>
   </component>
